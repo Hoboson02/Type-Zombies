@@ -66,6 +66,11 @@ void keyPressed() {
     println("the saved word is " + saved);
     word = "";
  }
+ else if(key == CODED&&keyCode==DOWN) {
+   setup();
+   killed = 0;
+   word = "";
+ }
   else word = word + key;
 }
 //********ALL DISPLAY****************************************************************************************************************************
@@ -99,6 +104,7 @@ void endScreen() {
   fill(255, 0, 0);
   textSize(64);
   text("Score: " + killed, width/2, height/1.5); 
+  text("Press the down arrow key to play again", width/2, height/1.1);
 }
 //**********AUDIO**************************************************************************************************************************
 void zombieMusic() {
