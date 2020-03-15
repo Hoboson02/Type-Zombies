@@ -19,6 +19,7 @@ import processing.sound.*;
 SoundFile file;
 String audio = "McZombie.mp3";
 String audio1 = "Scream.mp3";
+String audio2 = "MK.mp3";
 String path;
 Survivor survivor;
 Zombie zombie;
@@ -97,14 +98,21 @@ void survivorDead() {
 
 void endScreen() {
   //frameRate(0);
+  font = loadFont("Arial-Black-48.vlw");
+  textAlign(CENTER);
+  textFont(font);
+  textSize(250);
   fill(255, 0 , 0);
-  textSize(120);
   background (255);
   text("GAME OVER", width/2, height/2);
   fill(255, 0, 0);
   textSize(64);
   text("Score: " + killed, width/2, height/1.5); 
+  textSize(48);
   text("Press the down arrow key to play again", width/2, height/1.1);
+  path = sketchPath(audio2);
+  file = new SoundFile(this, path); 
+  file.play();
 }
 //**********AUDIO**************************************************************************************************************************
 void zombieMusic() {
