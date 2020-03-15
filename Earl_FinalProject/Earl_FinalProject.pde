@@ -5,6 +5,7 @@ Creates a zombie text-based game in which you type to survive
 */
 int spawnTime;
 final int WAIT_TIME = 4000;
+final int AUDIO_TIME = 2000;
 final int NUMBER_OF_PARTICLES = 20;
 String word = "";
 String saved = "";
@@ -127,13 +128,14 @@ void collision() {
   survivorDead();
   //endScreen();
   }
+  else if (survivor.collision(zombie)== false) {
+    //file.stop();
+  }
 }
 
 void survivorDead() {
   endScreen();
-  path = sketchPath(audio1);
-  file = new SoundFile(this, path); 
-  file.play();
+  survivorMusic();
   //file.stop();
   VELOCITY = 0;  
 }
@@ -145,6 +147,18 @@ void endScreen() {
   background (255);
   text("GAME OVER", width/2, height/2);
   drawCounter();
+}
+//**********AUDIO**************************************************************************************************************************
+void zombieMusic() {
+  path = sketchPath(audio);
+  file = new SoundFile(this, path); 
+  file.play();
+}
+
+void survivorMusic() {
+  path = sketchPath(audio1);
+  file = new SoundFile(this, path); 
+  file.play();  
 }
 //**********DEATH+EXPLOSION**************************************************************************************************************************
 void blood() {
@@ -176,10 +190,9 @@ void zombieDead() {
     new ParticleSystem(NUMBER_OF_PARTICLES, zombie.x+200, zombie.y+150)
   );
   VELOCITY = 0;
-  path = sketchPath(audio);
-  file = new SoundFile(this, path); 
-  file.play();
+  zombieMusic();
   //if (isTimerDone() == true) {
+  //  file.stop();
   //}
     
 }
