@@ -22,7 +22,7 @@ class Survivor {
 }
 
   boolean collision(Zombie zombie){
-   if (zombie.leftEdge() == leftEdge()){
+   if (zombie.leftEdge() <= leftEdge()){
      return true;
      
    }

@@ -6,13 +6,14 @@ Creates a zombie text-based game in which you type to survive
 int spawnTime;
 final int WAIT_TIME = 4000;
 final int AUDIO_TIME = 2000;
-final int NUMBER_OF_PARTICLES = 20;
+final int NUMBER_OF_PARTICLES = 40;
 String word = "";
 String saved = "";
 //String typing = "";
 float VELOCITY = 5;
 PFont font;
 int timeToSpawn;
+int killed;
 import processing.sound.*;
 
 SoundFile file;
@@ -24,7 +25,7 @@ Zombie zombie;
 
 
 ArrayList<ParticleSystem> particleSystems;
-ArrayList<ZombieSystem> zombieSystems;
+//ArrayList<ZombieSystem> zombieSystems;
 ArrayList<Zombie> zombies;
 
 //String[] names;
@@ -36,79 +37,33 @@ String[] words;
 void setup() {
   size(1920, 1000, FX2D);
   timeToSpawn = millis();
-  //words = loadStrings("Words.txt");
   zombies = new ArrayList<Zombie>();
-  //names = loadStrings("Words.txt");  
-  //println("There are " + words.length + " words.");
-  //for (int i = 0; i <words.length; ++i) {
-  //  zombies.add(new Zombie(words[i]));
-  //}
-  //print out each word in our words array
-
-  zombieSystems = new ArrayList <ZombieSystem>();
+  //zombieSystems = new ArrayList <ZombieSystem>();
   particleSystems = new ArrayList <ParticleSystem>();
   survivor = new Survivor();
   zombie = new Zombie();
-  
-  //draw title in center top of screen 
-  //specify a font type and size and use that font for the title.
-  
 }
 //**********DRAW**************************************************************************************************************************
 void draw() {
   background(155);
   textAlign(CENTER);
   fill(0);
-  boolean iMatched = zombie.isMatch(saved);
-  println("I matched is " + iMatched);
   explosion();
   blood();
-  //if (isTimerDone()) {
-  //  zombie.display();
-  //  zombie.move();
-    
-  //  spawnTime = millis() + WAIT_TIME;
-  //}
   display();
   zombie.move();
-  collision();
-  
-  if (millis()- timeToSpawn >= WAIT_TIME) {
-   println("tick");
-   timeToSpawn = millis();
-   zombies.add(zombie);
-  }
-  //for (int i = zombieSystems.size()-1; i >= 0; --i) {
-  //  ZombieSystem zs = zombieSystems.get(i); 
-  //  if (zs.isDead()) {
-  //    //particleSystems.add(
-  //    //new ParticleSystem(NUMBER_OF_PARTICLES, mouseX, mouseY)
-  //    //);
-  //    zombieSystems.remove(zs);
-  //  }
-  //  if (!zs.isDead()) {
-  //  zs.update();
-  //  zs.display();
-  //  }
-    
-  //}
-  //text(word, width/2, height/2);
+  zombie.collision(); 
+  timer();
 }
 //********KEY INPUTS****************************************************************************************************************************
 void keyPressed() {
-  //Saved = Typing; 
-  //test to see if the key is enter. If it is rememeber/save word into another string. Otherwise if not add to existing word 
   if(key == BACKSPACE && word.length ()>= 1){
       word = word.substring(0, word.length()-1) ;
       println(key);
     } 
  else if(key == ENTER) {
-    // If the return key is pressed, save the String and clear it
     saved = word.toLowerCase(); 
-    //saved = word; 
     println("the saved word is " + saved);
-    //
-    //A String can be cleared by setting it equal to ""
     word = "";
  }
   else word = word + key;
@@ -121,23 +76,18 @@ void display() {
   zombie.draw();
   survivor.display();
 }
-//**************COLLISION AND DEATH**********************************************************************************************************************
-void collision() {
-  if (survivor.collision(zombie)== true) {
-  println ("Dead");
-  survivorDead();
-  //endScreen();
-  }
-  else if (survivor.collision(zombie)== false) {
-    //file.stop();
+void timer() {
+  if (millis()- timeToSpawn >= WAIT_TIME) {
+   println("tick");
+   timeToSpawn = millis();
   }
 }
-
+//**************COLLISION AND DEATH**********************************************************************************************************************
 void survivorDead() {
   endScreen();
   survivorMusic();
   //file.stop();
-  VELOCITY = 0;  
+  zombie.xVelocity = 0;  
 }
 
 void endScreen() {
@@ -146,7 +96,9 @@ void endScreen() {
   textSize(120);
   background (255);
   text("GAME OVER", width/2, height/2);
-  drawCounter();
+  fill(255, 0, 0);
+  textSize(64);
+  text("Score: " + killed, width/2, height/1.5); 
 }
 //**********AUDIO**************************************************************************************************************************
 void zombieMusic() {
@@ -156,9 +108,9 @@ void zombieMusic() {
 }
 
 void survivorMusic() {
-  path = sketchPath(audio1);
-  file = new SoundFile(this, path); 
-  file.play();  
+  //path = sketchPath(audio1);
+  //file = new SoundFile(this, path); 
+  //file.play();  
 }
 //**********DEATH+EXPLOSION**************************************************************************************************************************
 void blood() {
@@ -175,36 +127,29 @@ void blood() {
   }
 }
 void explosion() {
-  if (zombie.isMatch(saved) == true) {
-  zombieDead();
+  if (zombie.isMatch(saved) == true && key == ENTER) {
+    particleSystems.add(
+    new ParticleSystem(NUMBER_OF_PARTICLES, zombie.x+200, zombie.y+150));
+  zombieMusic();
   }
+    else if (zombie.isMatch(saved) == false) {  
+  }
+  boolean iMatched = zombie.isMatch(saved);
+  println("I matched is " + iMatched);
 }
-
 boolean isTimerDone() {
  return (millis()>spawnTime); 
 }
-
-void zombieDead() {
-  blood();
-  particleSystems.add(
-    new ParticleSystem(NUMBER_OF_PARTICLES, zombie.x+200, zombie.y+150)
-  );
-  VELOCITY = 0;
-  zombieMusic();
-  //if (isTimerDone() == true) {
-  //  file.stop();
-  //}
-    
-}
 //********SCORE****************************************************************************************************************************
 void drawCounter() {
- fill(255, 0, 0);
- textSize(48);
  if (zombie.isMatch(saved) == true) {
-   text("Score: " +1, width/2, height/6);
+   killed += 1;
+   particleSystems.add(
+   new ParticleSystem(NUMBER_OF_PARTICLES, zombie.x+200, zombie.y+150));
+   particleSystems.add(
+   new ParticleSystem(NUMBER_OF_PARTICLES, width/2, height/2.5));
+   zombie = new Zombie();
  }
-   else  text("Score: " + 0, width/2, height/6);
- 
 }
 //********DISPLAY****************************************************************************************************************************
 
@@ -214,13 +159,16 @@ void displayTitle() {
   textFont(font);
   fill(255, 0, 0);
   text("Type Zombies", width/2, height/10);
+  fill(255, 0, 0);
+  textSize(64);
+  text("Score: " + killed, width/2, height/6); 
 }
 void displayPrompt() {
-  font = loadFont("Verdana-Italic-48.vlw");
+  font = loadFont("Arial-Black-48.vlw");
+  textAlign(CENTER);
   textFont(font);
+  fill(255, 0, 0);
   text("Please type in a word: ", width/2, 300);
   text(word, width/2, height/2.5);
 }
-  //else if (zombie.offScreen()){
-  //}
 //************************************************************************************************************************************
