@@ -4,13 +4,14 @@ Final Project
 Creates a zombie text-based game in which you type to survive 
 */
 int spawnTime;
-final int WAIT_TIME = 2000;
+final int WAIT_TIME = 4000;
 final int NUMBER_OF_PARTICLES = 20;
 String word = "";
 String saved = "";
 //String typing = "";
 float VELOCITY = 5;
 PFont font;
+int timeToSpawn;
 import processing.sound.*;
 
 SoundFile file;
@@ -19,6 +20,7 @@ String audio1 = "Scream.mp3";
 String path;
 Survivor survivor;
 Zombie zombie;
+
 
 ArrayList<ParticleSystem> particleSystems;
 ArrayList<ZombieSystem> zombieSystems;
@@ -32,7 +34,7 @@ String[] words;
 //********SETUP****************************************************************************************************************************
 void setup() {
   size(1920, 1000, FX2D);
-  //spawnTime = millis() + WAIT_TIME;
+  timeToSpawn = millis();
   //words = loadStrings("Words.txt");
   zombies = new ArrayList<Zombie>();
   //names = loadStrings("Words.txt");  
@@ -70,6 +72,11 @@ void draw() {
   zombie.move();
   collision();
   
+  if (millis()- timeToSpawn >= WAIT_TIME) {
+   println("tick");
+   timeToSpawn = millis();
+   zombies.add(zombie);
+  }
   //for (int i = zombieSystems.size()-1; i >= 0; --i) {
   //  ZombieSystem zs = zombieSystems.get(i); 
   //  if (zs.isDead()) {
@@ -105,10 +112,6 @@ void keyPressed() {
  }
   else word = word + key;
 }
-
-//boolean isTimerDone() {
-// return (millis()>spawnTime); 
-//}
 //********ALL DISPLAY****************************************************************************************************************************
 void display() {
   displayTitle();
@@ -163,6 +166,10 @@ void explosion() {
   }
 }
 
+boolean isTimerDone() {
+ return (millis()>spawnTime); 
+}
+
 void zombieDead() {
   blood();
   particleSystems.add(
@@ -172,6 +179,9 @@ void zombieDead() {
   path = sketchPath(audio);
   file = new SoundFile(this, path); 
   file.play();
+  //if (isTimerDone() == true) {
+  //}
+    
 }
 //********SCORE****************************************************************************************************************************
 void drawCounter() {
@@ -193,7 +203,7 @@ void displayTitle() {
   text("Type Zombies", width/2, height/10);
 }
 void displayPrompt() {
-  font = loadFont("Chiller-Regular-48.vlw");
+  font = loadFont("Verdana-Italic-48.vlw");
   textFont(font);
   text("Please type in a word: ", width/2, 300);
   text(word, width/2, height/2.5);
